@@ -10,4 +10,6 @@ public class RecordActivity extends SingleFragmentActivity {
     protected Fragment createFragment() {
         return RecordFragment.newInstance();
     }
+
+
 }
