@@ -19,9 +19,10 @@ public class XMLTagParser {
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
-            parser.nextTag();
-            parser.nextTag();
-            System.out.println("PARSER " + parser.getName());
+
+            parser.nextTag(); // Steps into the <metadata> tag
+            parser.nextTag(); // Steps into the <release-list> tag
+
             return readFeed(parser);
         } finally {
             in.close();
@@ -30,26 +31,20 @@ public class XMLTagParser {
 
     private List<Album> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
         List albums = new ArrayList();
-
-
         parser.require(XmlPullParser.START_TAG, ns, "release-list");
-
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             String name = parser.getName();
-            System.out.println("READ FEED " + name);
-            // Starts by looking for the entry tag
+            // Starts by looking for the album tag
             if (name.equals("release")) {
                 albums.add(readAlbum(parser));
             } else {
-              //  System.out.println("skipping readfead " + parser.getName());
                 skip(parser);
             }
         }
-        System.out.println("End Tag " + parser.getName());
         return albums;
     }
 
@@ -65,29 +60,35 @@ public class XMLTagParser {
                 continue;
             }
             String name = parser.getName();
+            // Gets the album title
             if (name.equals("title")) {
                 albumName = readTitle(parser);
-            } else if (name.equals("status")) {
+            }
+            // Finds out whether the album is official or a bootleg
+            else if (name.equals("status")) {
                 official = readStatus(parser);
             }
+            //  Gets the artist's name for the album
             else if (name.equals("artist-credit")) {
                 artist  = readArtist(parser);
             }
+            // Gets the year that the album was publsihed
             else if (name.equals("date")){
-                date = readDate(parser);
+                date = readDate(parser).substring(0,4);
             }
+            // Skips over a tag
             else {
-            //    System.out.println("skipping album " + parser.getName());
                 skip(parser);
             }
 
         }
-
+/*
         System.out.println("Album End Tag " + parser.getName());
         System.out.println("album name " + albumName);
         System.out.println("Date " + date);
         System.out.println("officlal " + official.toString());
         System.out.println("artist " + artist);
+        */
         Album album = new Album();
         album.setOfficial(official);
         album.setTitle(albumName);
@@ -95,23 +96,41 @@ public class XMLTagParser {
         return album;
     }
 
+    // Processes title tags in the feed.
+    private String readTitle(XmlPullParser parser) throws IOException, XmlPullParserException {
+        parser.require(XmlPullParser.START_TAG, ns, "title");
+        String title = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "title");
+        return title;
+    }
 
 
+    // Processes the album's status using the status tag
+    private Boolean readStatus(XmlPullParser parser) throws IOException, XmlPullParserException {
+        parser.require(XmlPullParser.START_TAG, ns, "status");
+        String official = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "status");
+        if(official.equals("Official")){
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
+
+    // Processes the artist tag
     private String readArtist(XmlPullParser parser) throws IOException, XmlPullParserException {
-
-      //  System.out.println("readArtist " + parser.getName());
-
         parser.require(XmlPullParser.START_TAG, ns, "artist-credit");
-       // String artist = readText(parser);
         String artist;
+
+
         while(!parser.getName().equals("name")){
             parser.nextTag();
         }
-        System.out.println("READ ARTIST " + parser.getName());
         artist = readText(parser);
 
-        System.out.println("ARTIST READ " + artist);
-
+        // Exits out of the nested tags
         parser.next();
         skip(parser);
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -127,11 +146,12 @@ public class XMLTagParser {
             parser.next();
         }
 
-
         parser.require(XmlPullParser.END_TAG, ns, "artist-credit");
+
         return artist;
     }
 
+    // Processes the album's date tags
     private String readDate(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "date");
         String date = readText(parser);
@@ -139,26 +159,6 @@ public class XMLTagParser {
         return date;
     }
 
-    // Processes title tags in the feed.
-    private String readTitle(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "title");
-        String title = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, "title");
-        return title;
-    }
-
-    private Boolean readStatus(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "status");
-        String official = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, "status");
-        if(official.equals("Official")){
-            return true;
-        }
-        else{
-            return false;
-        }
-
-    }
 
     // For the tags title and summary, extracts their text values.
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
@@ -169,6 +169,7 @@ public class XMLTagParser {
         }
         return result;
     }
+
 
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG) {
