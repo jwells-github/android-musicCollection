@@ -5,8 +5,7 @@ public class Album {
     private String mTitle;
     private String mArtistName;
     private String mReleaseYear;
-    private String mTrackCount;
-    private Boolean mBootleg;
+    private Boolean mOfficial;
 
     public String getTitle() {
         return mTitle;
@@ -32,19 +31,11 @@ public class Album {
         mReleaseYear = releaseYear;
     }
 
-    public String getTrackCount() {
-        return mTrackCount;
+    public Boolean isOfficial() {
+        return mOfficial;
     }
 
-    public void setTrackCount(String trackCount) {
-        mTrackCount = trackCount;
-    }
-
-    public Boolean getBootleg() {
-        return mBootleg;
-    }
-
-    public void setBootleg(Boolean bootleg) {
-        mBootleg = bootleg;
+    public void setOfficial(Boolean official) {
+        mOfficial = official;
     }
 }
