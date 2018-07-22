@@ -42,7 +42,9 @@ public class RecordFragment extends Fragment {
             try {
                 URL u = new URL("http://musicbrainz.org/ws/2/release/?query=artist:the_white_stripes%20AND%20primarytype:Album");
                 URLConnection uc = u.openConnection();
+                uc.setRequestProperty("User-Agent","HobbyApp ( jakewellsd@gmail.com )");
                 HttpURLConnection connection = (HttpURLConnection) uc;
+
                 InputStream in = connection.getInputStream();
 
                 List<Album> albums = new XMLTagParser().parse(in);
@@ -60,7 +62,7 @@ public class RecordFragment extends Fragment {
                 });
 
 
-                List<Album> albumsSorted = new ArrayList<>();   
+                List<Album> albumsSorted = new ArrayList<>();
                 List<String> albumTitles = new ArrayList<>();
 
                 // Remove Duplicate Album listings
