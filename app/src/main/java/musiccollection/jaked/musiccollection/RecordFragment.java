@@ -16,6 +16,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class RecordFragment extends Fragment {
@@ -42,10 +45,41 @@ public class RecordFragment extends Fragment {
                 HttpURLConnection connection = (HttpURLConnection) uc;
                 InputStream in = connection.getInputStream();
 
-                List<Album> abc = new XMLTagParser().parse(in);
-                System.out.println("Album titles");
-                for(Album a: abc){
-                    System.out.println(a.getTitle());
+                List<Album> albums = new XMLTagParser().parse(in);
+
+                // Sort the albums by release date
+                Collections.sort(albums, new Comparator<Album>() {
+                    @Override
+                    public int compare(Album album, Album albumTwo) {
+
+                        if (album.getReleaseYear() == null || albumTwo.getReleaseYear() == null){
+                            return 1;
+                        }
+                        return Integer.parseInt(album.getReleaseYear()) - Integer.parseInt(albumTwo.getReleaseYear());
+                    }
+                });
+
+
+                List<Album> albumsSorted = new ArrayList<>();   
+                List<String> albumTitles = new ArrayList<>();
+
+                // Remove Duplicate Album listings
+                for(Album a: albums){
+                    Boolean duplicate = false;
+                    for(String s : albumTitles){
+                        if(a.getTitle().equals(s)) {
+                            duplicate = true;
+                            break;
+                        }
+                    }
+                    if(!duplicate){
+                        albumsSorted.add(a);
+                        albumTitles.add(a.getTitle());
+                    }
+                }
+
+                for(Album a :albumsSorted){
+                    System.out.println(a.getTitle() + " " + a.getReleaseYear());
                 }
 
             } catch (MalformedURLException e) {

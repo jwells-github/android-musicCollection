@@ -83,16 +83,19 @@ public class XMLTagParser {
 
         }
 /*
+
         System.out.println("Album End Tag " + parser.getName());
         System.out.println("album name " + albumName);
         System.out.println("Date " + date);
         System.out.println("officlal " + official.toString());
         System.out.println("artist " + artist);
-        */
+*/
+
         Album album = new Album();
         album.setOfficial(official);
         album.setTitle(albumName);
-
+        album.setArtistName(artist);
+        album.setReleaseYear(date);
         return album;
     }
 

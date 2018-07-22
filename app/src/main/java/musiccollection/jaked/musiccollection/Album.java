@@ -38,4 +38,18 @@ public class Album {
     public void setOfficial(Boolean official) {
         mOfficial = official;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Album) {
+            return ((Album) obj).getTitle() == mTitle;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return this.mTitle.hashCode();
+    }
 }
