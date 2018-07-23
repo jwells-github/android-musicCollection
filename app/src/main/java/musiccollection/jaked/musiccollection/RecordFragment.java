@@ -4,7 +4,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -23,16 +27,51 @@ import java.util.List;
 
 public class RecordFragment extends Fragment {
 
+    private String mSearchQuery;
+
     public static RecordFragment newInstance() {
         return new RecordFragment();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        setHasOptionsMenu(true);
+        new XMLParser().execute();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_record, container, false);
-        new XMLParser().execute();
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        super.onCreateOptionsMenu(menu, menuInflater);
+        menuInflater.inflate(R.menu.fragment_record, menu)  ;
+        MenuItem searchItem = menu.findItem(R.id.menu_item_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(query != ""){
+                    mSearchQuery = query;
+                    mSearchQuery = mSearchQuery.replace(" ", "_");
+                    new XMLParser().execute();
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
     private class XMLParser extends AsyncTask<Void,Void,Void>{
@@ -40,7 +79,9 @@ public class RecordFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params){
             try {
-                URL u = new URL("http://musicbrainz.org/ws/2/release/?query=artist:the_white_stripes%20AND%20primarytype:Album");
+                System.out.println(mSearchQuery);
+              //  URL u = new URL("http://musicbrainz.org/ws/2/release/?query=artist:" + mSearchQuery  +"%20AND%20primarytype:Album");
+                URL u = new URL("http://musicbrainz.org/ws/2/release/?query=artist:the_adverts%20AND%20primarytype:Album");
                 URLConnection uc = u.openConnection();
                 uc.setRequestProperty("User-Agent","HobbyApp ( jakewellsd@gmail.com )");
                 HttpURLConnection connection = (HttpURLConnection) uc;
