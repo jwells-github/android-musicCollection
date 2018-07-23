@@ -38,7 +38,6 @@ public class RecordFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
-        new XMLParser().execute();
     }
 
     @Nullable
@@ -80,8 +79,7 @@ public class RecordFragment extends Fragment {
         protected Void doInBackground(Void... params){
             try {
                 System.out.println(mSearchQuery);
-              //  URL u = new URL("http://musicbrainz.org/ws/2/release/?query=artist:" + mSearchQuery  +"%20AND%20primarytype:Album");
-                URL u = new URL("http://musicbrainz.org/ws/2/release/?query=artist:the_adverts%20AND%20primarytype:Album");
+                URL u = new URL("http://musicbrainz.org/ws/2/release/?query=artist:" + mSearchQuery  +"%20AND%20primarytype:Album");
                 URLConnection uc = u.openConnection();
                 uc.setRequestProperty("User-Agent","HobbyApp ( jakewellsd@gmail.com )");
                 HttpURLConnection connection = (HttpURLConnection) uc;
