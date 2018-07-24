@@ -1,6 +1,9 @@
 package musiccollection.jaked.musiccollection;
 
-public class Album {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Album{
 
     private String mTitle;
     private String mArtistName;
@@ -52,4 +55,5 @@ public class Album {
 
         return this.mTitle.hashCode();
     }
+
 }

@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +29,7 @@ import java.util.List;
 public class RecordFragment extends Fragment {
 
     private String mSearchQuery;
+    private static final String DIALOG_ALBUM = "DialogAlbum";
 
     public static RecordFragment newInstance() {
         return new RecordFragment();
@@ -73,6 +75,12 @@ public class RecordFragment extends Fragment {
         });
     }
 
+    private void AlbumChoice(ArrayList<Album> albums){
+        FragmentManager manager = getFragmentManager();
+        AlbumPickerFragment dialog =  AlbumPickerFragment.newInstance(albums);
+        dialog.show(manager,DIALOG_ALBUM);
+    }
+
     private class XMLParser extends AsyncTask<Void,Void,Void>{
 
         @Override
@@ -101,7 +109,7 @@ public class RecordFragment extends Fragment {
                 });
 
 
-                List<Album> albumsSorted = new ArrayList<>();
+                ArrayList<Album> albumsSorted = new ArrayList<>();
                 List<String> albumTitles = new ArrayList<>();
 
                 // Remove Duplicate Album listings
@@ -122,6 +130,10 @@ public class RecordFragment extends Fragment {
                 for(Album a :albumsSorted){
                     System.out.println(a.getTitle() + " " + a.getReleaseYear());
                 }
+
+                AlbumChoice(albumsSorted);
+
+
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();

@@ -40,19 +40,16 @@ public class XMLTagParser {
             String name = parser.getName();
             // Starts by looking for the album tag
             if (name.equals("release")) {
-                System.out.println("reading album");
                 albums.add(readAlbum(parser));
             } else {
                 skip(parser);
             }
         }
-        System.out.println("returning albums");
         return albums;
     }
 
     private Album readAlbum(XmlPullParser parser) throws XmlPullParserException, IOException {
 
-        System.out.println("readAlbum");
         parser.require(XmlPullParser.START_TAG, ns, "release");
         String albumName = null;
         Boolean official = true;
@@ -78,7 +75,14 @@ public class XMLTagParser {
             }
             // Gets the year that the album was publsihed
             else if (name.equals("date")){
-                date = readDate(parser).substring(0,4);
+
+                date = readDate(parser);
+                if(date.equals("")){
+                   date = "0000";
+                }
+                else{
+                    date = date.substring(0,4);
+                }
             }
             // Skips over a tag
             else {
@@ -133,22 +137,17 @@ public class XMLTagParser {
 
 
         // Exits out of the nested tags
-        System.out.println(parser.getName());
         parser.next();
-        System.out.println(parser.getName());
         skip(parser);
         while(!parser.getName().equals("artist-credit")){
             while (parser.next() != XmlPullParser.END_TAG) {
-                System.out.println(parser.getName());
                 if(parser.next() == XmlPullParser.START_TAG){
                     skip(parser);
                 }
-                System.out.println(parser.getName());
                 parser.nextTag();
             }
         }
 
-        System.out.println("READARTIST " + parser.getName());
         parser.require(XmlPullParser.END_TAG, ns, "artist-credit");
 
         return artist;
