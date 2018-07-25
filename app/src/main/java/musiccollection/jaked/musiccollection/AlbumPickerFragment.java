@@ -82,7 +82,7 @@ public class AlbumPickerFragment extends DialogFragment {
             if (convertView == null) {
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_album, null);
             }
-                
+
             TextView tvAlbumName = (TextView) convertView.findViewById(R.id.tvAlbumName);
             TextView tvArtistName = (TextView) convertView.findViewById(R.id.tvArtistName);
             TextView tvYear = (TextView) convertView.findViewById(R.id.tvYear);

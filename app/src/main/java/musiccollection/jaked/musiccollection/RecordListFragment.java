@@ -28,14 +28,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class RecordFragment extends Fragment {
+public class RecordListFragment extends Fragment {
 
     private String mSearchQuery;
     private static final String DIALOG_ALBUM = "DialogAlbum";
     private static final int REQUEST_ALBUM = 0;
 
-    public static RecordFragment newInstance() {
-        return new RecordFragment();
+    public static RecordListFragment newInstance() {
+        return new RecordListFragment();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class RecordFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_record, container, false);
+        View v = inflater.inflate(R.layout.fragment_record_list, container, false);
         return v;
     }
 
@@ -81,7 +81,7 @@ public class RecordFragment extends Fragment {
     private void AlbumChoice(ArrayList<Album> albums){
         FragmentManager manager = getFragmentManager();
             AlbumPickerFragment dialog =  AlbumPickerFragment.newInstance(albums);
-        dialog.setTargetFragment(RecordFragment.this, REQUEST_ALBUM);
+        dialog.setTargetFragment(RecordListFragment.this, REQUEST_ALBUM);
         dialog.show(manager,DIALOG_ALBUM);
 
     }
