@@ -1,7 +1,9 @@
 package musiccollection.jaked.musiccollection;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -12,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,6 +27,7 @@ public class AlbumPickerFragment extends DialogFragment {
 
 
     private static final String ARG_ = "ar";
+    public static final String EXTRA_ALBUM = "jaked.musiccollection.album";
 
     public static AlbumPickerFragment newInstance(ArrayList<Album> albums){
         Bundle args = new Bundle();
@@ -37,7 +41,7 @@ public class AlbumPickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_album_picker,null);
-        ArrayList <Album> albums = (ArrayList<Album>) getArguments().getSerializable(ARG_);
+        final ArrayList <Album> albums = (ArrayList<Album>) getArguments().getSerializable(ARG_);
         System.out.println(albums.size());
 
 
@@ -46,6 +50,15 @@ public class AlbumPickerFragment extends DialogFragment {
         lvAlbumPicker.setAdapter(adapter);
         adapter.addAll(albums);
         adapter.notifyDataSetChanged();
+
+        lvAlbumPicker.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                System.out.println(albums.get(i).getTitle());
+                sendResult(Activity.RESULT_OK, albums.get(i));
+                getDialog().dismiss();
+            }
+        });
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle("Albums Found")
@@ -69,7 +82,7 @@ public class AlbumPickerFragment extends DialogFragment {
             if (convertView == null) {
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_album, null);
             }
-
+                
             TextView tvAlbumName = (TextView) convertView.findViewById(R.id.tvAlbumName);
             TextView tvArtistName = (TextView) convertView.findViewById(R.id.tvArtistName);
             TextView tvYear = (TextView) convertView.findViewById(R.id.tvYear);
@@ -83,5 +96,17 @@ public class AlbumPickerFragment extends DialogFragment {
 
 
         }
+
+
+    }
+
+    private void sendResult(int resultCode, Album album){
+        if(getTargetFragment() == null){
+            return;
+        }
+
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_ALBUM, album);
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }
 }

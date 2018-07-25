@@ -1,5 +1,7 @@
 package musiccollection.jaked.musiccollection;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -30,6 +32,7 @@ public class RecordFragment extends Fragment {
 
     private String mSearchQuery;
     private static final String DIALOG_ALBUM = "DialogAlbum";
+    private static final int REQUEST_ALBUM = 0;
 
     public static RecordFragment newInstance() {
         return new RecordFragment();
@@ -77,8 +80,25 @@ public class RecordFragment extends Fragment {
 
     private void AlbumChoice(ArrayList<Album> albums){
         FragmentManager manager = getFragmentManager();
-        AlbumPickerFragment dialog =  AlbumPickerFragment.newInstance(albums);
+            AlbumPickerFragment dialog =  AlbumPickerFragment.newInstance(albums);
+        dialog.setTargetFragment(RecordFragment.this, REQUEST_ALBUM);
         dialog.show(manager,DIALOG_ALBUM);
+
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if( resultCode != Activity.RESULT_OK){
+            return;
+        }
+
+        if(requestCode == REQUEST_ALBUM){
+            Album album = (Album) data.getParcelableExtra(AlbumPickerFragment.EXTRA_ALBUM);
+            System.out.println("we got " + album.getTitle());
+        }
     }
 
     private class XMLParser extends AsyncTask<Void,Void,Void>{
