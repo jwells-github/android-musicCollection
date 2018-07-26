@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -21,7 +19,6 @@ import android.widget.TextView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class AlbumPickerFragment extends DialogFragment {
 
@@ -80,7 +77,7 @@ public class AlbumPickerFragment extends DialogFragment {
             Album album = getItem(position);
 
             if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_album, null);
+                convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_album_picker, null);
             }
 
             TextView tvAlbumName = (TextView) convertView.findViewById(R.id.tvAlbumName);
