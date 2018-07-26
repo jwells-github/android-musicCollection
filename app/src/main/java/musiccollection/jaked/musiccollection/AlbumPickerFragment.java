@@ -29,7 +29,8 @@ public class AlbumPickerFragment extends DialogFragment {
     public static AlbumPickerFragment newInstance(ArrayList<Album> albums){
         Bundle args = new Bundle();
         args.putSerializable(ARG_, (Serializable) albums);
-        AlbumPickerFragment fragment = new AlbumPickerFragment();
+        AlbumPickerFragment fragment;
+        fragment = new AlbumPickerFragment();
         fragment.setArguments(args);
         return fragment;
     }

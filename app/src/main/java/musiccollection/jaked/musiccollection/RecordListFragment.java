@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -29,6 +32,10 @@ import java.util.Comparator;
 import java.util.List;
 
 public class RecordListFragment extends Fragment {
+    private RecyclerView mRecyclerView;
+    private AlbumAdapter mAdapter;
+
+    ArrayList<Album> mAlbums = new ArrayList<Album>();
 
     private String mSearchQuery;
     private static final String DIALOG_ALBUM = "DialogAlbum";
@@ -49,7 +56,71 @@ public class RecordListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_record_list, container, false);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        updateList();
+
+
         return v;
+    }
+
+    private void updateList(){
+        if(mAdapter == null){
+            mAdapter = new AlbumAdapter(mAlbums);
+            mRecyclerView.setAdapter(mAdapter);
+        }
+        else{
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private class AlbumHolder extends RecyclerView.ViewHolder{
+        public TextView mAlbumName;
+        public TextView mArtistName;
+        public TextView mYear;
+        public TextView mOfficial;
+
+
+        public AlbumHolder(LayoutInflater inflater, ViewGroup parent){
+            super(inflater.inflate(R.layout.list_item_album, parent, false));
+            mAlbumName = itemView.findViewById(R.id.tvAlbumName);
+            mArtistName = itemView.findViewById(R.id.tvArtistName);
+            mYear = itemView.findViewById(R.id.tvOfficial);
+        }
+    }
+
+    private class AlbumAdapter extends RecyclerView.Adapter<AlbumHolder>{
+        private ArrayList<Album> mAlbumArrayList;
+
+        public AlbumAdapter(ArrayList<Album> albums){
+            mAlbumArrayList = albums;
+        }
+
+        @Override
+        public AlbumHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            return new AlbumHolder(layoutInflater, viewGroup);
+        }
+
+        @Override
+        public void onBindViewHolder(AlbumHolder albumHolder, int i) {
+            Album album = mAlbumArrayList.get(i);
+            albumHolder.mAlbumName.setText(album.getTitle());
+
+        }
+
+        @Override
+        public int getItemCount() {
+            if (mAlbumArrayList != null){
+                return mAlbumArrayList.size();
+            }
+            else{
+                return 0;
+            }
+
+
+        }
     }
 
     @Override
@@ -98,6 +169,11 @@ public class RecordListFragment extends Fragment {
         if(requestCode == REQUEST_ALBUM){
             Album album = (Album) data.getParcelableExtra(AlbumPickerFragment.EXTRA_ALBUM);
             System.out.println("we got " + album.getTitle());
+            if(album == null){
+                System.out.println("what the fuck");
+            }
+            mAlbums.add(album);
+            updateList();
         }
     }
 
@@ -129,8 +205,8 @@ public class RecordListFragment extends Fragment {
                 });
 
 
-                ArrayList<Album> albumsSorted = new ArrayList<>();
-                List<String> albumTitles = new ArrayList<>();
+                ArrayList<Album> albumsSorted = new ArrayList<Album>();
+                List<String> albumTitles = new ArrayList<String>();
 
                 // Remove Duplicate Album listings
                 for(Album a: albums){
