@@ -3,18 +3,36 @@ package musiccollection.jaked.musiccollection;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.UUID;
+
 public class Album implements  Parcelable{
 
     private String mTitle;
     private String mArtistName;
     private String mReleaseYear;
     private Boolean mOfficial;
+    private int mRating;
+    private UUID mUUID;
 
     public Album(String title, String artistName, String releaseYear, boolean official) {
         mTitle = title;
         mArtistName = artistName;
         mReleaseYear = releaseYear;
         mOfficial = official;
+        mRating = 0;
+        mUUID = UUID.randomUUID();
+    }
+
+    public UUID getUUID() {
+        return mUUID;
+    }
+
+    public int getRating() {
+        return mRating;
+    }
+
+    public void setRating(int rating) {
+        mRating = rating;
     }
 
     public String getTitle() {
