@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -19,6 +21,9 @@ import android.widget.TextView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import musiccollection.jaked.musiccollection.database.MusicBaseHelper;
+import musiccollection.jaked.musiccollection.database.RecordSaver;
 
 public class AlbumPickerFragment extends DialogFragment {
 
@@ -53,6 +58,13 @@ public class AlbumPickerFragment extends DialogFragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 System.out.println(albums.get(i).getTitle());
+
+                RecordSaver recordSaver = new RecordSaver();
+                recordSaver.addRecord(albums.get(i), getContext());
+
+
+
+
                 sendResult(Activity.RESULT_OK, albums.get(i));
                 getDialog().dismiss();
             }
