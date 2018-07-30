@@ -23,6 +23,10 @@ public class Album implements  Parcelable{
         mUUID = UUID.randomUUID();
     }
 
+    public void setUUID(UUID UUID) {
+        mUUID = UUID;
+    }
+
     public UUID getUUID() {
         return mUUID;
     }

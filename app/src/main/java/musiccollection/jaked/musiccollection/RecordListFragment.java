@@ -31,6 +31,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import musiccollection.jaked.musiccollection.database.DatabaseReader;
+
 public class RecordListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private AlbumAdapter mAdapter;
@@ -50,6 +52,7 @@ public class RecordListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+        mAlbums = new DatabaseReader().DatabaseReader(getContext());
     }
 
     @Nullable

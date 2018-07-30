@@ -9,13 +9,11 @@ import musiccollection.jaked.musiccollection.Album;
 
 public class RecordSaver {
 
+
     public void addRecord(Album album, Context context){
         SQLiteDatabase database = new MusicBaseHelper(context).getWritableDatabase();
         ContentValues values = getContentValues(album);
-
         database.insert(MusicTable.NAME, null, values);
-
-
     }
 
 
