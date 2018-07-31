@@ -47,7 +47,6 @@ public class AlbumPickerFragment extends DialogFragment {
         final ArrayList <Album> albums = (ArrayList<Album>) getArguments().getSerializable(ARG_);
         System.out.println(albums.size());
 
-
         ListView lvAlbumPicker = v.findViewById(R.id.lvAlbumPicker);
         final AlbumAdapter adapter = new AlbumAdapter(getContext(), albums);
         lvAlbumPicker.setAdapter(adapter);
@@ -61,10 +60,6 @@ public class AlbumPickerFragment extends DialogFragment {
 
                 RecordSaver recordSaver = new RecordSaver();
                 recordSaver.addRecord(albums.get(i), getContext());
-
-
-
-
                 sendResult(Activity.RESULT_OK, albums.get(i));
                 getDialog().dismiss();
             }

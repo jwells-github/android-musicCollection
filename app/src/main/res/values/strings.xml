@@ -1,5 +1,17 @@
 <resources>
     <string name="app_name">MusicCollection</string>
     <string name="search">Search</string>
-    <string name="clear_search">Clear search</string>
+    <string name="official">Official</string>
+    <string name="unofficial">Unofficial</string>
+    <string name="add_custom">Add Custom Album</string>
+
+    <string name="album_name">Album Name</string>
+    <string name="album_name_hint">Enter an album name</string>
+    <string name="artist_name">Artist Name</string>
+    <string name="artist_name_hint">Enter an artist name</string>
+    <string name="release_year">Release Year</string>
+    <string name="release_year_hint">Enter the release year</string>
+    <string name="official_hint">Official Release</string>
+    <string name="rating">Rating</string>
+    <string name="create">Create</string>
 </resources>

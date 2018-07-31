@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -55,6 +56,13 @@ public class RecordListFragment extends Fragment {
         mAlbums = new DatabaseReader().DatabaseReader(getContext());
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mAlbums = new DatabaseReader().DatabaseReader(getContext());
+        updateList();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -69,13 +77,9 @@ public class RecordListFragment extends Fragment {
     }
 
     private void updateList(){
-        if(mAdapter == null){
-            mAdapter = new AlbumAdapter(mAlbums);
-            mRecyclerView.setAdapter(mAdapter);
-        }
-        else{
-            mAdapter.notifyDataSetChanged();
-        }
+        mAdapter = new AlbumAdapter(mAlbums);
+        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
     }
 
     private class AlbumHolder extends RecyclerView.ViewHolder{
@@ -83,13 +87,16 @@ public class RecordListFragment extends Fragment {
         public TextView mArtistName;
         public TextView mYear;
         public TextView mOfficial;
+        public RatingBar mRatingBar;
 
 
         public AlbumHolder(LayoutInflater inflater, ViewGroup parent){
             super(inflater.inflate(R.layout.list_item_album, parent, false));
             mAlbumName = itemView.findViewById(R.id.tvAlbumName);
             mArtistName = itemView.findViewById(R.id.tvArtistName);
-            mYear = itemView.findViewById(R.id.tvOfficial);
+            mYear = itemView.findViewById(R.id.tvYear);
+            mOfficial = itemView.findViewById(R.id.tvOfficial);
+            mRatingBar = itemView.findViewById(R.id.rbRating);
         }
     }
 
@@ -110,6 +117,21 @@ public class RecordListFragment extends Fragment {
         public void onBindViewHolder(AlbumHolder albumHolder, int i) {
             Album album = mAlbumArrayList.get(i);
             albumHolder.mAlbumName.setText(album.getTitle());
+            albumHolder.mArtistName.setText(album.getArtistName());
+            if(!album.getReleaseYear().equals("0000")){
+                albumHolder.mYear.setText(album.getReleaseYear());
+            }
+            else{
+                albumHolder.mYear.setText("");
+            }
+
+            if(album.isOfficial()){
+                albumHolder.mOfficial.setText("Official");
+            }
+            else{
+                albumHolder.mOfficial.setText("Unofficial");
+            }
+            albumHolder.mRatingBar.setNumStars(album.getRating());
 
         }
 
@@ -152,9 +174,23 @@ public class RecordListFragment extends Fragment {
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_add_custom:
+                // Add album and open album viewer
+                Intent intent = new Intent(getActivity(), CustomAlbumActivity.class);
+                startActivity(intent);
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+
+    }
+
     private void AlbumChoice(ArrayList<Album> albums){
         FragmentManager manager = getFragmentManager();
-            AlbumPickerFragment dialog =  AlbumPickerFragment.newInstance(albums);
+        AlbumPickerFragment dialog =  AlbumPickerFragment.newInstance(albums);
         dialog.setTargetFragment(RecordListFragment.this, REQUEST_ALBUM);
         dialog.show(manager,DIALOG_ALBUM);
 
