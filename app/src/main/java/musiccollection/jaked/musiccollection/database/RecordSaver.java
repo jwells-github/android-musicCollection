@@ -16,6 +16,13 @@ public class RecordSaver {
         database.insert(MusicTable.NAME, null, values);
     }
 
+    public void deleteRecord(Album album, Context context){
+        String uuidString = album.getUUID().toString();
+        SQLiteDatabase database = new MusicBaseHelper(context).getWritableDatabase();
+        database.delete(MusicTable.NAME,MusicTable.Cols.UUID + " = ?", new String[] { uuidString });
+
+    }
+
 
     public void updateRecord(Album album, Context context){
         String uuidString = album.getUUID().toString();

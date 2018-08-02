@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ public class CustomAlbumFragment extends Fragment {
     private String mArtistName;
     private String mReleaseYear = "0000";
     private Boolean mOfficial = true;
-    private int mRating = 0;
+    private float mRating = 0;
 
     public static CustomAlbumFragment newInstance(){
         return new CustomAlbumFragment();
@@ -99,7 +100,8 @@ public class CustomAlbumFragment extends Fragment {
             public void onClick(View view) {
 
                 mOfficial = cbOfficial.isChecked();
-                mRating = rbRating.getNumStars();
+                mRating = rbRating.getRating();
+                Log.d("RATING_CHOSEN", String.valueOf(mRating));
                 if(mAlbumName != null && mArtistName != null){
                     Album album = new Album(mAlbumName,mArtistName,mReleaseYear,mOfficial);
                     album.setRating(mRating);

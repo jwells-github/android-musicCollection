@@ -11,7 +11,7 @@ public class Album implements  Parcelable{
     private String mArtistName;
     private String mReleaseYear;
     private Boolean mOfficial;
-    private int mRating;
+    private float mRating;
     private UUID mUUID;
 
     public Album(String title, String artistName, String releaseYear, boolean official) {
@@ -31,11 +31,11 @@ public class Album implements  Parcelable{
         return mUUID;
     }
 
-    public int getRating() {
+    public float getRating() {
         return mRating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(float rating) {
         mRating = rating;
     }
 
@@ -100,6 +100,9 @@ public class Album implements  Parcelable{
         else {
             mOfficial = false;
         }
+
+        this.mRating = Float.parseFloat(data[4]);
+        this.mUUID = UUID.fromString(data[5]);
     }
 
 
@@ -119,7 +122,10 @@ public class Album implements  Parcelable{
         }
         dest.writeStringArray(new String[] {this.mTitle,
                 this.mArtistName,
-                this.mReleaseYear,official});
+                this.mReleaseYear,
+                official,
+                String.valueOf(this.mRating),
+                this.mUUID.toString()});
     }
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
         public Album createFromParcel(Parcel in) {

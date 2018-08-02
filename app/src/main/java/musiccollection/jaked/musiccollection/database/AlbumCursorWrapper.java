@@ -25,7 +25,7 @@ public class AlbumCursorWrapper extends CursorWrapper {
         String artist = getString(getColumnIndex(MusicTable.Cols.ARTIST));
         String year = getString(getColumnIndex(MusicTable.Cols.YEAR));
         int official = getInt(getColumnIndex(MusicTable.Cols.OFFICIAL));
-        int rating = getInt(getColumnIndex(MusicTable.Cols.RATING));
+        float rating = getFloat(getColumnIndex(MusicTable.Cols.RATING));
 
         Boolean officialBool = (official != 0);
         Album album = new Album(title, artist, year, officialBool);

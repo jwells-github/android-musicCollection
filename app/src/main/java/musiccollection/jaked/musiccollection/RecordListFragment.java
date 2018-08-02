@@ -7,9 +7,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,16 +36,20 @@ import java.util.Comparator;
 import java.util.List;
 
 import musiccollection.jaked.musiccollection.database.DatabaseReader;
+import musiccollection.jaked.musiccollection.database.RecordSaver;
 
 public class RecordListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private AlbumAdapter mAdapter;
 
-    ArrayList<Album> mAlbums = new ArrayList<Album>();
+    private ActionMode mActionMode;
 
+    ArrayList<Album> mAlbums = new ArrayList<Album>();
+    ArrayList<Album> mAlbumsToDelete = new ArrayList<Album>();
     private String mSearchQuery;
     private static final String DIALOG_ALBUM = "DialogAlbum";
     private static final int REQUEST_ALBUM = 0;
+
 
     public static RecordListFragment newInstance() {
         return new RecordListFragment();
@@ -59,7 +66,6 @@ public class RecordListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mAlbums = new DatabaseReader().DatabaseReader(getContext());
         updateList();
     }
 
@@ -70,6 +76,8 @@ public class RecordListFragment extends Fragment {
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+
+
         updateList();
 
 
@@ -77,6 +85,7 @@ public class RecordListFragment extends Fragment {
     }
 
     private void updateList(){
+        mAlbums = new DatabaseReader().DatabaseReader(getContext());
         mAdapter = new AlbumAdapter(mAlbums);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
@@ -96,7 +105,7 @@ public class RecordListFragment extends Fragment {
             mArtistName = itemView.findViewById(R.id.tvArtistName);
             mYear = itemView.findViewById(R.id.tvYear);
             mOfficial = itemView.findViewById(R.id.tvOfficial);
-            mRatingBar = itemView.findViewById(R.id.rbRating);
+            mRatingBar = itemView.findViewById(R.id.ratingBar);
         }
     }
 
@@ -114,8 +123,8 @@ public class RecordListFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(AlbumHolder albumHolder, int i) {
-            Album album = mAlbumArrayList.get(i);
+        public void onBindViewHolder(AlbumHolder albumHolder, final int i) {
+            final Album album = mAlbumArrayList.get(i);
             albumHolder.mAlbumName.setText(album.getTitle());
             albumHolder.mArtistName.setText(album.getArtistName());
             if(!album.getReleaseYear().equals("0000")){
@@ -131,7 +140,35 @@ public class RecordListFragment extends Fragment {
             else{
                 albumHolder.mOfficial.setText("Unofficial");
             }
-            albumHolder.mRatingBar.setNumStars(album.getRating());
+            Log.d("RATING", String.valueOf(album.getRating()));
+            albumHolder.mRatingBar.setRating(album.getRating());
+
+            albumHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+
+
+                    if(!view.isSelected()){
+                        mAlbumsToDelete.add(mAlbums.get(i));
+                        Log.d("albumcount", String.valueOf(mAlbumsToDelete.size()));
+                        view.setSelected(true);
+                        view.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+                    }
+                    else{
+                        mAlbumsToDelete.remove(mAlbums.get(i));
+                        view.setSelected(false);
+                        view.setBackgroundColor(getResources().getColor(android.R.color.background_light));
+                    }
+
+                    if(mActionMode == null && mAlbumsToDelete.size() > 0 ){
+                        mActionMode = getActivity().startActionMode(mActionModeCallback);
+                    }
+                    else if(mAlbumsToDelete.size() < 1 && mActionMode != null){
+                        mActionMode.finish();
+                    }
+                    return view.isSelected();
+                }
+            });
 
         }
 
@@ -146,12 +183,13 @@ public class RecordListFragment extends Fragment {
 
 
         }
+
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         super.onCreateOptionsMenu(menu, menuInflater);
-        menuInflater.inflate(R.menu.fragment_record, menu)  ;
+        menuInflater.inflate(R.menu.fragment_record_list, menu)  ;
         MenuItem searchItem = menu.findItem(R.id.menu_item_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
 
@@ -207,14 +245,60 @@ public class RecordListFragment extends Fragment {
 
         if(requestCode == REQUEST_ALBUM){
             Album album = (Album) data.getParcelableExtra(AlbumPickerFragment.EXTRA_ALBUM);
-            System.out.println("we got " + album.getTitle());
-            if(album == null){
-                System.out.println("what the fuck");
-            }
             mAlbums.add(album);
             updateList();
         }
     }
+
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        // Called when the action mode is created; startActionMode() was called
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.context_menu_record_list, menu);
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_item_delete:
+                    if(mAlbumsToDelete.size() > 0){
+                        RecordSaver recordSaver = new RecordSaver();
+
+                        for(Album a : mAlbumsToDelete){
+                            recordSaver.deleteRecord(a,getContext());
+                        }
+
+                        updateList();
+                    }
+                    mode.finish(); // Action picked, so close the CAB
+                case R.id.menu_item_cancel:
+                    updateList();
+                    mAlbumsToDelete.clear();
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+        }
+    };
 
     private class XMLParser extends AsyncTask<Void,Void,Void>{
 
