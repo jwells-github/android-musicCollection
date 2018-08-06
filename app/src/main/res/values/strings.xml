@@ -14,4 +14,5 @@
     <string name="official_hint">Official Release</string>
     <string name="rating">Rating</string>
     <string name="create">Create</string>
+    <string name="edit">Edit</string>
 </resources>

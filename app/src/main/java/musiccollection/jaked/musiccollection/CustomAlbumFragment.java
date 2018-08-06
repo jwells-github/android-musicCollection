@@ -18,11 +18,14 @@ import musiccollection.jaked.musiccollection.database.RecordSaver;
 
 public class CustomAlbumFragment extends Fragment {
 
+    private static final String EDIT_ALBUM = "EditAlbum";
     private String mAlbumName;
     private String mArtistName;
     private String mReleaseYear = "0000";
     private Boolean mOfficial = true;
     private float mRating = 0;
+
+    private Album mAlbum;
 
     public static CustomAlbumFragment newInstance(){
         return new CustomAlbumFragment();
@@ -30,6 +33,14 @@ public class CustomAlbumFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+
+        if (getActivity().getIntent().getParcelableExtra(EDIT_ALBUM) == null){
+            mAlbum = null;
+        }
+        else{
+            mAlbum = getActivity().getIntent().getParcelableExtra(EDIT_ALBUM);
+        }
+
         super.onCreate(savedInstanceState);
     }
 
@@ -43,6 +54,21 @@ public class CustomAlbumFragment extends Fragment {
         final CheckBox cbOfficial = v.findViewById(R.id.cbOfficial);
         final RatingBar rbRating = v.findViewById(R.id.rbRating);
         Button btCreate = v.findViewById(R.id.btCreate);
+
+        if(mAlbum != null){
+            mAlbumName = mAlbum.getTitle();
+            mArtistName = mAlbum.getArtistName();
+            mReleaseYear = mAlbum.getReleaseYear();
+            mOfficial = mAlbum.isOfficial();
+            mRating = mAlbum.getRating();
+
+            etAlbumName.setText(mAlbum.getTitle());
+            etArtistName.setText(mAlbum.getArtistName());
+            etReleaseYear.setText(mAlbum.getReleaseYear());
+            cbOfficial.setChecked(mAlbum.isOfficial());
+            rbRating.setRating(mAlbum.getRating());
+            btCreate.setText(R.string.edit);
+        }
 
         etAlbumName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -101,12 +127,27 @@ public class CustomAlbumFragment extends Fragment {
 
                 mOfficial = cbOfficial.isChecked();
                 mRating = rbRating.getRating();
-                Log.d("RATING_CHOSEN", String.valueOf(mRating));
+
                 if(mAlbumName != null && mArtistName != null){
-                    Album album = new Album(mAlbumName,mArtistName,mReleaseYear,mOfficial);
-                    album.setRating(mRating);
                     RecordSaver recordSaver = new RecordSaver();
-                    recordSaver.addRecord(album, getContext());
+                    if(mAlbum == null){
+                        Album album = new Album(mAlbumName,mArtistName,mReleaseYear,mOfficial);
+                        album.setRating(mRating);
+
+                        recordSaver.addRecord(album, getContext());
+                    }
+                    else{
+                        mAlbum.setTitle(mAlbumName);
+                        mAlbum.setArtistName(mArtistName);
+                        mAlbum.setReleaseYear(mReleaseYear);
+                        mAlbum.setOfficial(mOfficial);
+                        mAlbum.setRating(mRating);
+
+                       recordSaver.updateRecord(mAlbum, getContext());
+                    }
+
+
+
                     getActivity().finish();
                 }
 

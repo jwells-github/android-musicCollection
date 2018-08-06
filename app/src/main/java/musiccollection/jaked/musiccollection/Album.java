@@ -86,8 +86,10 @@ public class Album implements  Parcelable{
     }
 
     public Album(Parcel in){
-        String[] data = new String[3];
+        String[] data = new String[6];
 
+
+        System.out.println(data.length);
         in.readStringArray(data);
         // the order needs to be the same as in writeToParcel() method
         this.mTitle = data[0];

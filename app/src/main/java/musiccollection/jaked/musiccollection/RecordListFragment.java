@@ -1,4 +1,4 @@
-package musiccollection.jaked.musiccollection;
+    package musiccollection.jaked.musiccollection;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -48,6 +48,7 @@ public class RecordListFragment extends Fragment {
     ArrayList<Album> mAlbumsToDelete = new ArrayList<Album>();
     private String mSearchQuery;
     private static final String DIALOG_ALBUM = "DialogAlbum";
+    private static final String EDIT_ALBUM = "EditAlbum";
     private static final int REQUEST_ALBUM = 0;
 
 
@@ -61,6 +62,12 @@ public class RecordListFragment extends Fragment {
         setRetainInstance(true);
         setHasOptionsMenu(true);
         mAlbums = new DatabaseReader().DatabaseReader(getContext());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mActionMode = null;
     }
 
     @Override
@@ -106,6 +113,7 @@ public class RecordListFragment extends Fragment {
             mYear = itemView.findViewById(R.id.tvYear);
             mOfficial = itemView.findViewById(R.id.tvOfficial);
             mRatingBar = itemView.findViewById(R.id.ratingBar);
+
         }
     }
 
@@ -123,7 +131,7 @@ public class RecordListFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(AlbumHolder albumHolder, final int i) {
+        public void onBindViewHolder(final AlbumHolder albumHolder, final int i) {
             final Album album = mAlbumArrayList.get(i);
             albumHolder.mAlbumName.setText(album.getTitle());
             albumHolder.mArtistName.setText(album.getArtistName());
@@ -143,10 +151,22 @@ public class RecordListFragment extends Fragment {
             Log.d("RATING", String.valueOf(album.getRating()));
             albumHolder.mRatingBar.setRating(album.getRating());
 
+
+            albumHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getActivity(), CustomAlbumActivity.class);
+                    intent.putExtra(EDIT_ALBUM, mAlbumArrayList.get(i));
+                    startActivity(intent);
+
+                }
+            });
+
             albumHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
 
+            System.out.println(view.isSelected());
 
                     if(!view.isSelected()){
                         mAlbumsToDelete.add(mAlbums.get(i));
@@ -160,11 +180,12 @@ public class RecordListFragment extends Fragment {
                         view.setBackgroundColor(getResources().getColor(android.R.color.background_light));
                     }
 
-                    if(mActionMode == null && mAlbumsToDelete.size() > 0 ){
+                    if( mActionMode == null &&   mAlbumsToDelete.size() > 0 ){
                         mActionMode = getActivity().startActionMode(mActionModeCallback);
                     }
-                    else if(mAlbumsToDelete.size() < 1 && mActionMode != null){
+                    else if( mAlbumsToDelete.size() < 1  && mActionMode != null){
                         mActionMode.finish();
+                        return true; // Update list is called, so the view no longer exists
                     }
                     return view.isSelected();
                 }
@@ -271,6 +292,8 @@ public class RecordListFragment extends Fragment {
         // Called when the user selects a contextual menu item
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+
             switch (item.getItemId()) {
                 case R.id.menu_item_delete:
                     if(mAlbumsToDelete.size() > 0){
@@ -284,19 +307,24 @@ public class RecordListFragment extends Fragment {
                     }
                     mode.finish(); // Action picked, so close the CAB
                 case R.id.menu_item_cancel:
-                    updateList();
-                    mAlbumsToDelete.clear();
                     mode.finish();
+                    updateList();
+                    mAlbumsToDelete .clear();
                     return true;
                 default:
                     return false;
             }
+
+
         }
 
         // Called when the user exits the action mode
         @Override
         public void onDestroyActionMode(ActionMode mode) {
+
+            mAlbumsToDelete .clear();
             mActionMode = null;
+            updateList();
         }
     };
 
