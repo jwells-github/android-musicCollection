@@ -38,11 +38,13 @@ import java.util.List;
 import musiccollection.jaked.musiccollection.database.DatabaseReader;
 import musiccollection.jaked.musiccollection.database.RecordSaver;
 
-public class RecordListFragment extends Fragment {
+public class RecordListFragment extends Fragment  {
     private RecyclerView mRecyclerView;
     private AlbumAdapter mAdapter;
 
     private ActionMode mActionMode;
+
+    public boolean mClosedAutomaticaly = false;
 
     ArrayList<Album> mAlbums = new ArrayList<Album>();
     ArrayList<Album> mAlbumsToDelete = new ArrayList<Album>();
@@ -64,16 +66,19 @@ public class RecordListFragment extends Fragment {
         mAlbums = new DatabaseReader().DatabaseReader(getContext());
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mActionMode = null;
+        mClosedAutomaticaly = true;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         updateList();
+        mClosedAutomaticaly = false;
     }
 
     @Nullable
@@ -86,6 +91,7 @@ public class RecordListFragment extends Fragment {
 
 
         updateList();
+
 
 
         return v;
@@ -119,6 +125,7 @@ public class RecordListFragment extends Fragment {
 
     private class AlbumAdapter extends RecyclerView.Adapter<AlbumHolder>{
         private ArrayList<Album> mAlbumArrayList;
+        private ArrayList<Album> toDelete = mAlbumsToDelete;
 
         public AlbumAdapter(ArrayList<Album> albums){
             mAlbumArrayList = albums;
@@ -162,6 +169,17 @@ public class RecordListFragment extends Fragment {
                 }
             });
 
+            System.out.println("ARRAY LENGTH " + toDelete.size());
+            System.out.println("ARRAY LENGTH " + mAlbumsToDelete.size());
+            for(Album a : toDelete){
+                System.out.println(a.getTitle());
+                if(a.getUUID().equals(album.getUUID())){
+                    mActionMode = getActivity().startActionMode(mActionModeCallback);
+                    albumHolder.itemView.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+                    albumHolder.itemView.setSelected(true);
+                    break;
+                }
+            }
             albumHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
@@ -169,13 +187,13 @@ public class RecordListFragment extends Fragment {
             System.out.println(view.isSelected());
 
                     if(!view.isSelected()){
-                        mAlbumsToDelete.add(mAlbums.get(i));
+                        mAlbumsToDelete.add(album);
                         Log.d("albumcount", String.valueOf(mAlbumsToDelete.size()));
                         view.setSelected(true);
                         view.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
                     }
                     else{
-                        mAlbumsToDelete.remove(mAlbums.get(i));
+                        mAlbumsToDelete.remove(album);
                         view.setSelected(false);
                         view.setBackgroundColor(getResources().getColor(android.R.color.background_light));
                     }
@@ -184,6 +202,7 @@ public class RecordListFragment extends Fragment {
                         mActionMode = getActivity().startActionMode(mActionModeCallback);
                     }
                     else if( mAlbumsToDelete.size() < 1  && mActionMode != null){
+                        mClosedAutomaticaly = true;
                         mActionMode.finish();
                         return true; // Update list is called, so the view no longer exists
                     }
@@ -204,6 +223,8 @@ public class RecordListFragment extends Fragment {
 
 
         }
+
+
 
     }
 
@@ -279,6 +300,7 @@ public class RecordListFragment extends Fragment {
             // Inflate a menu resource providing context menu items
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.context_menu_record_list, menu);
+
             return true;
         }
 
@@ -292,8 +314,6 @@ public class RecordListFragment extends Fragment {
         // Called when the user selects a contextual menu item
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-
             switch (item.getItemId()) {
                 case R.id.menu_item_delete:
                     if(mAlbumsToDelete.size() > 0){
@@ -321,12 +341,15 @@ public class RecordListFragment extends Fragment {
         // Called when the user exits the action mode
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-
-            mAlbumsToDelete .clear();
+            if(!mClosedAutomaticaly){
+                mAlbumsToDelete .clear();
+            }
+            mClosedAutomaticaly = false;
             mActionMode = null;
-            updateList();
+          //  updateList();
         }
     };
+
 
     private class XMLParser extends AsyncTask<Void,Void,Void>{
 
