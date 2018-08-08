@@ -52,7 +52,7 @@ public class RecordListFragment extends Fragment  {
     private static final String DIALOG_ALBUM = "DialogAlbum";
     private static final String EDIT_ALBUM = "EditAlbum";
     private static final int REQUEST_ALBUM = 0;
-
+    private SearchView searchView;
 
     public static RecordListFragment newInstance() {
         return new RecordListFragment();
@@ -75,10 +75,18 @@ public class RecordListFragment extends Fragment  {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        System.out.println("onpause");
+        mClosedAutomaticaly = true;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
+        System.out.println("onresume");
         updateList();
-        mClosedAutomaticaly = false;
+        System.out.println("mclosedautomaticaly "+ mClosedAutomaticaly);
     }
 
     @Nullable
@@ -169,13 +177,11 @@ public class RecordListFragment extends Fragment  {
                 }
             });
 
-            System.out.println("ARRAY LENGTH " + toDelete.size());
-            System.out.println("ARRAY LENGTH " + mAlbumsToDelete.size());
             for(Album a : toDelete){
                 System.out.println(a.getTitle());
                 if(a.getUUID().equals(album.getUUID())){
                     mActionMode = getActivity().startActionMode(mActionModeCallback);
-                    albumHolder.itemView.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+                    albumHolder.itemView.setBackgroundColor(getResources().getColor(R.color.colorRowSelected));
                     albumHolder.itemView.setSelected(true);
                     break;
                 }
@@ -190,7 +196,7 @@ public class RecordListFragment extends Fragment  {
                         mAlbumsToDelete.add(album);
                         Log.d("albumcount", String.valueOf(mAlbumsToDelete.size()));
                         view.setSelected(true);
-                        view.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+                        view.setBackgroundColor(getResources().getColor(R.color.colorRowSelected));
                     }
                     else{
                         mAlbumsToDelete.remove(album);
@@ -233,7 +239,7 @@ public class RecordListFragment extends Fragment  {
         super.onCreateOptionsMenu(menu, menuInflater);
         menuInflater.inflate(R.menu.fragment_record_list, menu)  ;
         MenuItem searchItem = menu.findItem(R.id.menu_item_search);
-        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView = (SearchView) searchItem.getActionView();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -316,6 +322,7 @@ public class RecordListFragment extends Fragment  {
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.menu_item_delete:
+                    System.out.println(mAlbumsToDelete.size());
                     if(mAlbumsToDelete.size() > 0){
                         RecordSaver recordSaver = new RecordSaver();
 
@@ -343,6 +350,7 @@ public class RecordListFragment extends Fragment  {
         public void onDestroyActionMode(ActionMode mode) {
             if(!mClosedAutomaticaly){
                 mAlbumsToDelete .clear();
+                System.out.println("cleared albumstodelete");
             }
             mClosedAutomaticaly = false;
             mActionMode = null;

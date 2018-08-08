@@ -48,8 +48,8 @@ public class CustomAlbumFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_custom_album, container, false);
-        EditText etAlbumName = v.findViewById(R.id.etAlbumName);
-        EditText etArtistName = v.findViewById(R.id.etArtistName);
+        final EditText etAlbumName = v.findViewById(R.id.etAlbumName);
+        final EditText etArtistName = v.findViewById(R.id.etArtistName);
         EditText etReleaseYear = v.findViewById(R.id.etReleaseYear);
         final CheckBox cbOfficial = v.findViewById(R.id.cbOfficial);
         final RatingBar rbRating = v.findViewById(R.id.rbRating);
@@ -145,10 +145,15 @@ public class CustomAlbumFragment extends Fragment {
 
                        recordSaver.updateRecord(mAlbum, getContext());
                     }
-
-
-
                     getActivity().finish();
+                }
+                else{
+                    if(mAlbum == null){
+                        etAlbumName.setBackgroundColor(getResources().getColor(R.color.colorTextMissing));
+                    }
+                    if(mArtistName == null){
+                        etArtistName.setBackgroundColor(getResources().getColor(R.color.colorTextMissing));
+                    }
                 }
 
             }
