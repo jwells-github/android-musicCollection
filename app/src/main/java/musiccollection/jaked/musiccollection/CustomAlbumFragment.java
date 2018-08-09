@@ -24,7 +24,6 @@ public class CustomAlbumFragment extends Fragment {
     private String mReleaseYear = "0000";
     private Boolean mOfficial = true;
     private float mRating = 0;
-
     private Album mAlbum;
 
     public static CustomAlbumFragment newInstance(){
@@ -34,13 +33,13 @@ public class CustomAlbumFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
 
+        // Check if we are editing an existing album or creating a new one
         if (getActivity().getIntent().getParcelableExtra(EDIT_ALBUM) == null){
             mAlbum = null;
         }
         else{
             mAlbum = getActivity().getIntent().getParcelableExtra(EDIT_ALBUM);
         }
-
         super.onCreate(savedInstanceState);
     }
 
@@ -55,6 +54,7 @@ public class CustomAlbumFragment extends Fragment {
         final RatingBar rbRating = v.findViewById(R.id.rbRating);
         Button btCreate = v.findViewById(R.id.btCreate);
 
+        // If we are editng an existing album, set all of the text  fields to match
         if(mAlbum != null){
             mAlbumName = mAlbum.getTitle();
             mArtistName = mAlbum.getArtistName();
@@ -73,7 +73,10 @@ public class CustomAlbumFragment extends Fragment {
         etAlbumName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                if(mAlbumName == null){
+                    // Change the backgroundColor back to default
+                    etAlbumName.setBackgroundColor(getResources().getColor(R.color.colorBackground));
+                }
             }
 
             @Override
@@ -90,7 +93,10 @@ public class CustomAlbumFragment extends Fragment {
         etArtistName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                if(mArtistName == null){
+                    // Change the backgroundColor back to default
+                    etArtistName.setBackgroundColor(getResources().getColor(R.color.colorBackground));
+                }
             }
 
             @Override
@@ -100,7 +106,9 @@ public class CustomAlbumFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
+                if(mArtistName.isEmpty()){
+                    mArtistName = null;
+                }
             }
         });
 
@@ -128,14 +136,17 @@ public class CustomAlbumFragment extends Fragment {
                 mOfficial = cbOfficial.isChecked();
                 mRating = rbRating.getRating();
 
+                // Check if an Album name and Artist name have been set
                 if(mAlbumName != null && mArtistName != null){
                     RecordSaver recordSaver = new RecordSaver();
+
+                    // If the user is creating a new album, save it
                     if(mAlbum == null){
                         Album album = new Album(mAlbumName,mArtistName,mReleaseYear,mOfficial);
                         album.setRating(mRating);
-
                         recordSaver.addRecord(album, getContext());
                     }
+                    // If the user is editing an existing album, update it
                     else{
                         mAlbum.setTitle(mAlbumName);
                         mAlbum.setArtistName(mArtistName);
@@ -147,8 +158,9 @@ public class CustomAlbumFragment extends Fragment {
                     }
                     getActivity().finish();
                 }
+                // Highlight any fields that are missing values.
                 else{
-                    if(mAlbum == null){
+                    if(mAlbumName == null){
                         etAlbumName.setBackgroundColor(getResources().getColor(R.color.colorTextMissing));
                     }
                     if(mArtistName == null){

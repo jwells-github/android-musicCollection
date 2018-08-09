@@ -5,17 +5,18 @@ import android.os.Parcelable;
 
 import java.util.UUID;
 
+// Albums needs to be created parcelable so that it can be passed between views as an Extra
 public class Album implements  Parcelable{
 
-    private String mTitle;
+    private String mAlbumTitle;
     private String mArtistName;
     private String mReleaseYear;
     private Boolean mOfficial;
     private float mRating;
     private UUID mUUID;
 
-    public Album(String title, String artistName, String releaseYear, boolean official) {
-        mTitle = title;
+    public Album(String albumTitle, String artistName, String releaseYear, boolean official) {
+        mAlbumTitle = albumTitle;
         mArtistName = artistName;
         mReleaseYear = releaseYear;
         mOfficial = official;
@@ -40,11 +41,11 @@ public class Album implements  Parcelable{
     }
 
     public String getTitle() {
-        return mTitle;
+        return mAlbumTitle;
     }
 
     public void setTitle(String title) {
-        mTitle = title;
+        mAlbumTitle = title;
     }
 
     public String getArtistName() {
@@ -74,25 +75,21 @@ public class Album implements  Parcelable{
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Album) {
-            return ((Album) obj).getTitle() == mTitle;
+            return ((Album) obj).getTitle() == mAlbumTitle;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-
-        return this.mTitle.hashCode();
+        return this.mAlbumTitle.hashCode();
     }
 
+    //
     public Album(Parcel in){
         String[] data = new String[6];
-
-
-        System.out.println(data.length);
         in.readStringArray(data);
-        // the order needs to be the same as in writeToParcel() method
-        this.mTitle = data[0];
+        this.mAlbumTitle = data[0];
         this.mArtistName = data[1];
         this.mReleaseYear = data[2];
 
@@ -102,7 +99,6 @@ public class Album implements  Parcelable{
         else {
             mOfficial = false;
         }
-
         this.mRating = Float.parseFloat(data[4]);
         this.mUUID = UUID.fromString(data[5]);
     }
@@ -111,7 +107,6 @@ public class Album implements  Parcelable{
     public int describeContents(){
         return 0;
     }
-
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         String official;
@@ -122,7 +117,7 @@ public class Album implements  Parcelable{
         else{
             official = "false";
         }
-        dest.writeStringArray(new String[] {this.mTitle,
+        dest.writeStringArray(new String[] {this.mAlbumTitle,
                 this.mArtistName,
                 this.mReleaseYear,
                 official,

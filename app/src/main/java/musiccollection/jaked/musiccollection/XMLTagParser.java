@@ -10,9 +10,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+// Parses the given XML document for albums
 public class XMLTagParser {
 
+    // Namespaces not required
     private static final String ns = null;
+
 
     public List<Album> parse(InputStream in) throws XmlPullParserException, IOException {
         try {
@@ -29,6 +32,7 @@ public class XMLTagParser {
         }
     }
 
+    // Parses through all of the <release> tags
     private List<Album> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
         List<Album> albums = new ArrayList<Album>();
         parser.require(XmlPullParser.START_TAG, ns, "release-list");
@@ -48,8 +52,8 @@ public class XMLTagParser {
         return albums;
     }
 
+    // Gets the required information from each album
     private Album readAlbum(XmlPullParser parser) throws XmlPullParserException, IOException {
-
         parser.require(XmlPullParser.START_TAG, ns, "release");
         String albumName = null;
         Boolean official = true;
@@ -91,20 +95,7 @@ public class XMLTagParser {
 
         }
 
-
-        System.out.println("Album End Tag " + parser.getName());
-        System.out.println("album name " + albumName);
-        System.out.println("Date " + date);
-        System.out.println("officlal " + official.toString());
-        System.out.println("artist " + artist);
-
         Album album = new Album(albumName,artist,date,official);
-/*
-        album.setOfficial(official);
-        album.setTitle(albumName);
-        album.setArtistName(artist);
-        album.setReleaseYear(date);
-        */
         return album;
     }
 
@@ -174,7 +165,7 @@ public class XMLTagParser {
         return result;
     }
 
-
+    // Skips over unwanted tags
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();

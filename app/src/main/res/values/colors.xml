@@ -5,4 +5,5 @@
     <color name="colorAccent">#448AFF</color>
     <color name="colorTextMissing">#ff4f4f</color>
     <color name="colorRowSelected">#66bb6a</color>
+    <color name="colorBackground">#FAFAFA</color>
 </resources>

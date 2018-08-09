@@ -1,6 +1,8 @@
 package musiccollection.jaked.musiccollection.database;
 
+// Defines the cloumns of the SQLite database
 public class MusicDbSchema {
+
     public static final class MusicTable{
         public static final String NAME = "music";
 

@@ -25,15 +25,18 @@ import java.util.ArrayList;
 import musiccollection.jaked.musiccollection.database.MusicBaseHelper;
 import musiccollection.jaked.musiccollection.database.RecordSaver;
 
+
+// Dialog fragment that shows the user the albums found from their search
 public class AlbumPickerFragment extends DialogFragment {
 
-
-    private static final String ARG_ = "ar";
+    private static final String RECEIVED_ALBUMS = "RECEIVED_ALBUMS";
     public static final String EXTRA_ALBUM = "jaked.musiccollection.album";
+
+
 
     public static AlbumPickerFragment newInstance(ArrayList<Album> albums){
         Bundle args = new Bundle();
-        args.putSerializable(ARG_, (Serializable) albums);
+        args.putSerializable(RECEIVED_ALBUMS, (Serializable) albums);
         AlbumPickerFragment fragment;
         fragment = new AlbumPickerFragment();
         fragment.setArguments(args);
@@ -44,29 +47,28 @@ public class AlbumPickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_album_picker,null);
-        final ArrayList <Album> albums = (ArrayList<Album>) getArguments().getSerializable(ARG_);
-        System.out.println(albums.size());
-
+        final ArrayList <Album> albums = (ArrayList<Album>) getArguments().getSerializable(RECEIVED_ALBUMS);
         ListView lvAlbumPicker = v.findViewById(R.id.lvAlbumPicker);
         final AlbumAdapter adapter = new AlbumAdapter(getContext(), albums);
         lvAlbumPicker.setAdapter(adapter);
         adapter.addAll(albums);
         adapter.notifyDataSetChanged();
 
+        // Save the clicked album and exit
         lvAlbumPicker.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                System.out.println(albums.get(i).getTitle());
 
                 RecordSaver recordSaver = new RecordSaver();
                 recordSaver.addRecord(albums.get(i), getContext());
-                sendResult(Activity.RESULT_OK, albums.get(i));
+                // Let RecordListFragment know to update the list view
+                sendResult(Activity.RESULT_OK);
                 getDialog().dismiss();
             }
         });
 
         return new AlertDialog.Builder(getActivity())
-                .setTitle("Albums Found")
+                .setTitle(R.string.albums_found)
                 .setPositiveButton(android.R.string.ok, null)
                 .setView(v)
                 .create();
@@ -105,13 +107,14 @@ public class AlbumPickerFragment extends DialogFragment {
 
     }
 
-    private void sendResult(int resultCode, Album album){
+    // Let RecordListFragment know to update the list view
+    private void sendResult(int resultCode){
         if(getTargetFragment() == null){
             return;
         }
 
         Intent intent = new Intent();
-        intent.putExtra(EXTRA_ALBUM, album);
+        intent.putExtra(EXTRA_ALBUM, "");
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }
 }

@@ -41,11 +41,8 @@ import musiccollection.jaked.musiccollection.database.RecordSaver;
 public class RecordListFragment extends Fragment  {
     private RecyclerView mRecyclerView;
     private AlbumAdapter mAdapter;
-
     private ActionMode mActionMode;
-
     public boolean mClosedAutomaticaly = false;
-
     ArrayList<Album> mAlbums = new ArrayList<Album>();
     ArrayList<Album> mAlbumsToDelete = new ArrayList<Album>();
     private String mSearchQuery;
@@ -63,6 +60,7 @@ public class RecordListFragment extends Fragment  {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+        // Get the saved albums from the database
         mAlbums = new DatabaseReader().DatabaseReader(getContext());
     }
 
@@ -70,23 +68,23 @@ public class RecordListFragment extends Fragment  {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        // Remove the Actionmode
         mActionMode = null;
+        // Do not clear the selected albums to delete
         mClosedAutomaticaly = true;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        System.out.println("onpause");
+        // Do not clear the selected albums to delete
         mClosedAutomaticaly = true;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("onresume");
         updateList();
-        System.out.println("mclosedautomaticaly "+ mClosedAutomaticaly);
     }
 
     @Nullable
@@ -95,16 +93,11 @@ public class RecordListFragment extends Fragment  {
         View v = inflater.inflate(R.layout.fragment_record_list, container, false);
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-
-
         updateList();
-
-
-
         return v;
     }
 
+    //  Reset and update the data in the Recyleview
     private void updateList(){
         mAlbums = new DatabaseReader().DatabaseReader(getContext());
         mAdapter = new AlbumAdapter(mAlbums);
@@ -119,7 +112,6 @@ public class RecordListFragment extends Fragment  {
         public TextView mOfficial;
         public RatingBar mRatingBar;
 
-
         public AlbumHolder(LayoutInflater inflater, ViewGroup parent){
             super(inflater.inflate(R.layout.list_item_album, parent, false));
             mAlbumName = itemView.findViewById(R.id.tvAlbumName);
@@ -127,18 +119,15 @@ public class RecordListFragment extends Fragment  {
             mYear = itemView.findViewById(R.id.tvYear);
             mOfficial = itemView.findViewById(R.id.tvOfficial);
             mRatingBar = itemView.findViewById(R.id.ratingBar);
-
         }
     }
 
     private class AlbumAdapter extends RecyclerView.Adapter<AlbumHolder>{
         private ArrayList<Album> mAlbumArrayList;
         private ArrayList<Album> toDelete = mAlbumsToDelete;
-
         public AlbumAdapter(ArrayList<Album> albums){
             mAlbumArrayList = albums;
         }
-
         @Override
         public AlbumHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
@@ -163,22 +152,20 @@ public class RecordListFragment extends Fragment  {
             else{
                 albumHolder.mOfficial.setText("Unofficial");
             }
-            Log.d("RATING", String.valueOf(album.getRating()));
             albumHolder.mRatingBar.setRating(album.getRating());
 
-
+            // Open the selected album to edit
             albumHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(getActivity(), CustomAlbumActivity.class);
                     intent.putExtra(EDIT_ALBUM, mAlbumArrayList.get(i));
                     startActivity(intent);
-
                 }
             });
 
+            // On rotation, highlight any albums that were previously selected to be deleted
             for(Album a : toDelete){
-                System.out.println(a.getTitle());
                 if(a.getUUID().equals(album.getUUID())){
                     mActionMode = getActivity().startActionMode(mActionModeCallback);
                     albumHolder.itemView.setBackgroundColor(getResources().getColor(R.color.colorRowSelected));
@@ -186,15 +173,13 @@ public class RecordListFragment extends Fragment  {
                     break;
                 }
             }
+
+            // Select or Deselect an album to be deleted
             albumHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-
-            System.out.println(view.isSelected());
-
                     if(!view.isSelected()){
                         mAlbumsToDelete.add(album);
-                        Log.d("albumcount", String.valueOf(mAlbumsToDelete.size()));
                         view.setSelected(true);
                         view.setBackgroundColor(getResources().getColor(R.color.colorRowSelected));
                     }
@@ -204,9 +189,11 @@ public class RecordListFragment extends Fragment  {
                         view.setBackgroundColor(getResources().getColor(android.R.color.background_light));
                     }
 
+                    // Start the action menu if atleast one album is selected
                     if( mActionMode == null &&   mAlbumsToDelete.size() > 0 ){
                         mActionMode = getActivity().startActionMode(mActionModeCallback);
                     }
+                    // If no albums are selected hide the actionmenu
                     else if( mAlbumsToDelete.size() < 1  && mActionMode != null){
                         mClosedAutomaticaly = true;
                         mActionMode.finish();
@@ -215,7 +202,6 @@ public class RecordListFragment extends Fragment  {
                     return view.isSelected();
                 }
             });
-
         }
 
         @Override
@@ -226,12 +212,7 @@ public class RecordListFragment extends Fragment  {
             else{
                 return 0;
             }
-
-
         }
-
-
-
     }
 
     @Override
@@ -241,6 +222,7 @@ public class RecordListFragment extends Fragment  {
         MenuItem searchItem = menu.findItem(R.id.menu_item_search);
         searchView = (SearchView) searchItem.getActionView();
 
+        // Search the API with the given search term
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -274,26 +256,23 @@ public class RecordListFragment extends Fragment  {
 
     }
 
+    // Start a Dialog fragment displaying the albums received from the user's search
     private void AlbumChoice(ArrayList<Album> albums){
         FragmentManager manager = getFragmentManager();
         AlbumPickerFragment dialog =  AlbumPickerFragment.newInstance(albums);
         dialog.setTargetFragment(RecordListFragment.this, REQUEST_ALBUM);
         dialog.show(manager,DIALOG_ALBUM);
-
     }
 
 
+    // Update the list if the user selects an album from the dialog fragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if( resultCode != Activity.RESULT_OK){
             return;
         }
-
         if(requestCode == REQUEST_ALBUM){
-            Album album = (Album) data.getParcelableExtra(AlbumPickerFragment.EXTRA_ALBUM);
-            mAlbums.add(album);
             updateList();
         }
     }
@@ -321,18 +300,17 @@ public class RecordListFragment extends Fragment  {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
+                // Deletes all selected albums
                 case R.id.menu_item_delete:
-                    System.out.println(mAlbumsToDelete.size());
                     if(mAlbumsToDelete.size() > 0){
                         RecordSaver recordSaver = new RecordSaver();
-
                         for(Album a : mAlbumsToDelete){
                             recordSaver.deleteRecord(a,getContext());
                         }
-
                         updateList();
                     }
                     mode.finish(); // Action picked, so close the CAB
+                // Exit the aciton menu and deselect all albums
                 case R.id.menu_item_cancel:
                     mode.finish();
                     updateList();
@@ -350,21 +328,18 @@ public class RecordListFragment extends Fragment  {
         public void onDestroyActionMode(ActionMode mode) {
             if(!mClosedAutomaticaly){
                 mAlbumsToDelete .clear();
-                System.out.println("cleared albumstodelete");
             }
             mClosedAutomaticaly = false;
             mActionMode = null;
-          //  updateList();
         }
     };
 
-
+    // Request the albums relating to the user's search from the API
     private class XMLParser extends AsyncTask<Void,Void,Void>{
 
         @Override
         protected Void doInBackground(Void... params){
             try {
-                System.out.println(mSearchQuery);
                 URL u = new URL("http://musicbrainz.org/ws/2/release/?query=artist:" + mSearchQuery  +"%20AND%20primarytype:Album");
                 URLConnection uc = u.openConnection();
                 uc.setRequestProperty("User-Agent","HobbyApp ( jakewellsd@gmail.com )");
@@ -403,10 +378,6 @@ public class RecordListFragment extends Fragment  {
                         albumsSorted.add(a);
                         albumTitles.add(a.getTitle());
                     }
-                }
-
-                for(Album a :albumsSorted){
-                    System.out.println(a.getTitle() + " " + a.getReleaseYear());
                 }
 
                 AlbumChoice(albumsSorted);

@@ -8,6 +8,4 @@ public class RecordListActivity extends SingleFragmentActivity {
     protected Fragment createFragment() {
         return RecordListFragment.newInstance();
     }
-
-
 }
