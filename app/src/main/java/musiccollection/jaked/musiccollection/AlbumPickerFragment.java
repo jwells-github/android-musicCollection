@@ -95,7 +95,7 @@ public class AlbumPickerFragment extends DialogFragment {
             TextView tvYear = (TextView) convertView.findViewById(R.id.tvYear);
 
             tvArtistName.setText(album.getArtistName());
-            tvAlbumName.setText(album.getTitle());
+            tvAlbumName.setText(album.getAlbumTitle());
             tvYear.setText(album.getReleaseYear());
 
 

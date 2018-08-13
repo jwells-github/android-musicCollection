@@ -56,13 +56,13 @@ public class CustomAlbumFragment extends Fragment {
 
         // If we are editng an existing album, set all of the text  fields to match
         if(mAlbum != null){
-            mAlbumName = mAlbum.getTitle();
+            mAlbumName = mAlbum.getAlbumTitle();
             mArtistName = mAlbum.getArtistName();
             mReleaseYear = mAlbum.getReleaseYear();
             mOfficial = mAlbum.isOfficial();
             mRating = mAlbum.getRating();
 
-            etAlbumName.setText(mAlbum.getTitle());
+            etAlbumName.setText(mAlbum.getAlbumTitle());
             etArtistName.setText(mAlbum.getArtistName());
             etReleaseYear.setText(mAlbum.getReleaseYear());
             cbOfficial.setChecked(mAlbum.isOfficial());
@@ -148,7 +148,7 @@ public class CustomAlbumFragment extends Fragment {
                     }
                     // If the user is editing an existing album, update it
                     else{
-                        mAlbum.setTitle(mAlbumName);
+                        mAlbum.setAlbumTitle(mAlbumName);
                         mAlbum.setArtistName(mArtistName);
                         mAlbum.setReleaseYear(mReleaseYear);
                         mAlbum.setOfficial(mOfficial);

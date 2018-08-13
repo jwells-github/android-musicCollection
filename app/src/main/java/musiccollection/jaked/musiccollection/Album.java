@@ -40,11 +40,11 @@ public class Album implements  Parcelable{
         mRating = rating;
     }
 
-    public String getTitle() {
+    public String getAlbumTitle() {
         return mAlbumTitle;
     }
 
-    public void setTitle(String title) {
+    public void setAlbumTitle(String title) {
         mAlbumTitle = title;
     }
 
@@ -75,7 +75,7 @@ public class Album implements  Parcelable{
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Album) {
-            return ((Album) obj).getTitle() == mAlbumTitle;
+            return ((Album) obj).getAlbumTitle() == mAlbumTitle;
         }
         return false;
     }

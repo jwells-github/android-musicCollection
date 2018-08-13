@@ -39,7 +39,7 @@ public class RecordSaver {
     private static ContentValues getContentValues(Album album){
         ContentValues values = new ContentValues();
         values.put(MusicTable.Cols.UUID, album.getUUID().toString());
-        values.put(MusicTable.Cols.TITLE, album.getTitle());
+        values.put(MusicTable.Cols.TITLE, album.getAlbumTitle());
         values.put(MusicTable.Cols.ARTIST, album.getArtistName());
         values.put(MusicTable.Cols.YEAR, album.getReleaseYear());
         values.put(MusicTable.Cols.OFFICIAL, album.isOfficial() ? 1 : 0);

@@ -137,7 +137,7 @@ public class RecordListFragment extends Fragment  {
         @Override
         public void onBindViewHolder(final AlbumHolder albumHolder, final int i) {
             final Album album = mAlbumArrayList.get(i);
-            albumHolder.mAlbumName.setText(album.getTitle());
+            albumHolder.mAlbumName.setText(album.getAlbumTitle());
             albumHolder.mArtistName.setText(album.getArtistName());
             if(!album.getReleaseYear().equals("0000")){
                 albumHolder.mYear.setText(album.getReleaseYear());
@@ -369,14 +369,14 @@ public class RecordListFragment extends Fragment  {
                 for(Album a: albums){
                     Boolean duplicate = false;
                     for(String s : albumTitles){
-                        if(a.getTitle().equals(s)) {
+                        if(a.getAlbumTitle().equals(s)) {
                             duplicate = true;
                             break;
                         }
                     }
                     if(!duplicate){
                         albumsSorted.add(a);
-                        albumTitles.add(a.getTitle());
+                        albumTitles.add(a.getAlbumTitle());
                     }
                 }
 
