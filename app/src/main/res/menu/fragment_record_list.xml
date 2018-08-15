@@ -3,7 +3,8 @@
     <item android:id="@+id/menu_item_search"
         android:title="@string/search"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"
+        android:imeOptions="actionSearch"/>
     <item android:id="@+id/menu_add_custom"
         android:title="@string/add_custom"
         app:showAsAction="never"/>

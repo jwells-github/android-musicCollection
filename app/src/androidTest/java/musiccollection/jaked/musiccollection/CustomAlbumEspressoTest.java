@@ -17,6 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -37,7 +38,8 @@ public class CustomAlbumEspressoTest {
             ActivityTestRule<CustomAlbumActivity>(CustomAlbumActivity.class);
 
     @Test
-    public void checkEditTextViews(){
+    public void checkEditTextViewsExists(){
+        onView(withId(R.id.etArtistName)).check(matches(isDisplayed()));
         onView(withId(R.id.etArtistName)).perform(typeText("Bob Dylan"));
         onView(withId(R.id.etArtistName)).check(matches(withText("Bob Dylan")));
     }
