@@ -1,5 +1,5 @@
 # android-musicCollection
-An android app that allows for users to store and rate album information
+An android app that allows  users to store and rate album information
 
 The app is written in Java. 
 
